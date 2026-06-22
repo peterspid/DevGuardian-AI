@@ -7,7 +7,7 @@ import './globals.css'
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL?.startsWith('http')
   ? process.env.NEXT_PUBLIC_APP_URL
-  : 'https://frontend-gamma-ten-34.vercel.app'
+  : 'https://devguardian-ai.vercel.app'
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
