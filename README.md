@@ -2,11 +2,31 @@
 
 DevGuardian AI is a production-oriented, Terminal3-verified multi-agent software engineering workspace. It turns a repository request into a guarded workflow across Planner, Code, Security, Test, Review, and Deploy agents, then records permission checks, Terminal3 delegation witnesses, and release decisions into an audit trail.
 
+Live app: https://devguardian-ai.vercel.app
+
+Render backend: https://devguardian-ai-backend.onrender.com
+
+GitHub repository: https://github.com/imthegoodboy/DevGuardian-AI
+
+Hackathon challenge: https://dorahacks.io/hackathon/t3adkdevchallenge/detail
+
 The app was built for the Terminal3 ADK Developer Challenge:
 
 - Completeness: landing page, dashboard, agent chat, repository scanner, security center, test center, deployment gate, agent monitor, audit trail, and production API routes.
 - SDK integration: server-side `@terminal3/t3n-sdk` authentication, WASM loading, signed delegation credentials, signed invocation witnesses, usage/audit diagnostics, and protected agent action checks.
 - Creativity: AI coding agents are treated as scoped actors. They can request `repo.read`, `repo.write`, `security.scan`, `tests.run`, `review.approve`, and `deploy.release`, but privileged routes require an operator token and Terminal3-backed witnesses.
+
+## Problem The Agent Solves
+
+Modern AI coding agents can plan, write, test, review, and deploy software, but teams still need to answer the hard production questions: who asked the agent to act, what permission did it use, which protected resource did it touch, and why was a release approved. Without that evidence, agent automation becomes difficult to trust in real engineering workflows.
+
+DevGuardian AI solves that by acting as an auditable control plane for software engineering agents. It routes each task through specialized agents, maps every meaningful action to a scoped Terminal3 permission, creates signed evidence for protected operations, and stores the result in a reviewable audit trail before deployment is allowed.
+
+## Why Verifiable Identity Matters
+
+Verifiable identity is important because DevGuardian agents are not just chat assistants; they represent actors that can request repository access, run security checks, approve reviews, and prepare production releases. Every agent action needs a cryptographic identity and scoped permission boundary so the system can prove which agent acted, what it was allowed to do, and whether the request was authorized.
+
+Terminal3 Agent Auth SDK gives DevGuardian that trust layer. Instead of relying on plain logs or UI claims, the app builds Terminal3-backed delegation witnesses for protected actions such as `repo.read`, `repo.write`, `security.scan`, `tests.run`, `review.approve`, and `deploy.release`. That makes the agent workflow accountable, inspectable, and safer for production use.
 
 ## What It Does
 
@@ -102,7 +122,7 @@ MONGODB_DB=devguardian_ai
 DEVGUARDIAN_OPERATOR_TOKEN=
 DEVGUARDIAN_REQUIRE_OPERATOR_TOKEN=true
 DEVGUARDIAN_ALLOW_MEMORY_AUDIT=false
-NEXT_PUBLIC_APP_URL=
+NEXT_PUBLIC_APP_URL=https://devguardian-ai.vercel.app
 ```
 
 Optional:
@@ -160,7 +180,15 @@ Render:
 
 Current production targets:
 
-- Frontend: https://frontend-gamma-ten-34.vercel.app
+- Frontend: https://devguardian-ai.vercel.app
+- Vercel deployment alias: https://frontend-gamma-ten-34.vercel.app
 - Render backend: https://devguardian-ai-backend.onrender.com
 
 Set the same `DEVGUARDIAN_OPERATOR_TOKEN`, Terminal3, OpenAI, MongoDB, and optional GitHub values in both Vercel and Render so the frontend and backend behavior match.
+
+## Useful Links
+
+- Terminal3 ADK overview: https://docs.terminal3.io/developers/adk/overview/what-is-adk
+- Terminal3 T3N overview: https://docs.terminal3.io/t3n/overview/what-is-t3n
+- Terminal3 platform: https://docs.terminal3.io/intro/platform
+- Terminal3 product page: https://www.terminal3.io/products/agent-developer-kit
