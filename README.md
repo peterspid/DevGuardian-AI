@@ -6,8 +6,29 @@ Live app: https://devguardian-ai.vercel.app
 
 Render backend: https://devguardian-ai-backend.onrender.com
 
- 
- 
+## Judge Demo Flow
+
+Use this shared demo operator token when reviewing the live app:
+
+```bash
+DEVGUARDIAN_OPERATOR_TOKEN=WKUQtejITIuX5tgju6AuoHxhjrBGtA95wbs1usPTaJ0
+DEVGUARDIAN_REQUIRE_OPERATOR_TOKEN=true
+DEVGUARDIAN_ALLOW_MEMORY_AUDIT=true
+```
+
+Demo steps:
+
+1. Open https://devguardian-ai.vercel.app.
+2. Paste `WKUQtejITIuX5tgju6AuoHxhjrBGtA95wbs1usPTaJ0` into the `DEVGUARDIAN_OPERATOR_TOKEN` field in the top header.
+3. Click `Save`; the header should show `Operator token active`.
+4. Open `/dashboard` to confirm Terminal3 live authentication and the rotated DID preview.
+5. Open `/chat`, run the default request, and inspect the Terminal3-backed proof rows.
+6. Open `/repository`, scan a GitHub repository, and check the `repo.read` witness.
+7. Open `/deployments`, test the approval gate, and confirm deploy remains controlled by `deploy.release`.
+8. Open `/audit` to review the persisted action trail.
+
+This token is intentionally exposed for hackathon judging only. Rotate `DEVGUARDIAN_OPERATOR_TOKEN` after judging if the deployment stays public.
+
 
 The app was built for the Terminal3 ADK Developer Challenge:
 
