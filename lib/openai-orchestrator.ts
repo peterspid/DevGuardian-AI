@@ -1,6 +1,6 @@
 import "server-only"
 
-import { defaultPipeline, type PipelineStep } from "@/lib/devguardian-data"
+import { defaultPipeline, type AgentId, type Permission, type PipelineStep } from "@/lib/devguardian-data"
 
 export interface OrchestratedPlan {
   model: string
@@ -51,22 +51,110 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   })
 }
 
-function parsePlan(text: string, prompt: string): OrchestratedPlan {
-  try {
-    const parsed = JSON.parse(text) as Partial<OrchestratedPlan>
+function extractJsonObject(text: string) {
+  const trimmed = text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim()
+
+  if (!trimmed) return ""
+  if (trimmed.startsWith("{") && trimmed.endsWith("}")) return trimmed
+
+  const start = trimmed.indexOf("{")
+  if (start === -1) return ""
+
+  let depth = 0
+  let inString = false
+  let escaped = false
+
+  for (let index = start; index < trimmed.length; index += 1) {
+    const char = trimmed[index]
+    if (escaped) {
+      escaped = false
+      continue
+    }
+    if (char === "\\") {
+      escaped = inString
+      continue
+    }
+    if (char === "\"") {
+      inString = !inString
+      continue
+    }
+    if (inString) continue
+    if (char === "{") depth += 1
+    if (char === "}") depth -= 1
+    if (depth === 0) return trimmed.slice(start, index + 1)
+  }
+
+  return ""
+}
+
+function stringValue(value: unknown) {
+  return typeof value === "string" && value.trim() ? value.trim() : ""
+}
+
+function numberValue(value: unknown, fallback: number) {
+  return typeof value === "number" && Number.isFinite(value) ? Math.max(0, Math.min(100, Math.round(value))) : fallback
+}
+
+function normalizePipeline(value: unknown, fallback: PipelineStep[]): PipelineStep[] {
+  if (!Array.isArray(value) || value.length === 0) return fallback
+
+  return fallback.map((baseStep, index) => {
+    const item = value[index]
+    if (!item || typeof item !== "object") return baseStep
+    const record = item as Record<string, unknown>
+
     return {
-      model: parsed.model || process.env.OPENAI_MODEL || "gpt-5.5",
+      ...baseStep,
+      id: stringValue(record.id) || `${baseStep.id}-${Date.now()}-${index}`,
+      agentId: (stringValue(record.agentId) as AgentId) || baseStep.agentId,
+      name: stringValue(record.name) || stringValue(record.task) || baseStep.name,
+      permission: (stringValue(record.permission) as Permission) || baseStep.permission,
+      status: baseStep.status,
+      protectedAction:
+        typeof record.protectedAction === "boolean" ? record.protectedAction : baseStep.protectedAction,
+      score: numberValue(record.score, baseStep.score),
+      output:
+        stringValue(record.output) ||
+        stringValue(record.result) ||
+        stringValue(record.summary) ||
+        baseStep.output,
+    }
+  })
+}
+
+function textArray(value: unknown, fallback: string[]) {
+  if (!Array.isArray(value)) return fallback
+  const normalized = value.map((item) => stringValue(item)).filter(Boolean).slice(0, 8)
+  return normalized.length ? normalized : fallback
+}
+
+function parsePlan(text: string, prompt: string): OrchestratedPlan {
+  const fallback = deterministicPlan(prompt)
+  const jsonText = extractJsonObject(text)
+
+  try {
+    const parsed = JSON.parse(jsonText || text) as Partial<OrchestratedPlan>
+    return {
+      model: stringValue(parsed.model) || process.env.OPENAI_MODEL || "gpt-5.5",
       source: "openai",
-      summary: parsed.summary || deterministicPlan(prompt).summary,
-      pipeline: parsed.pipeline?.length ? parsed.pipeline : deterministicPlan(prompt).pipeline,
-      review: parsed.review || deterministicPlan(prompt).review,
-      recommendedDiff: parsed.recommendedDiff?.length ? parsed.recommendedDiff : deterministicPlan(prompt).recommendedDiff,
+      summary: stringValue(parsed.summary) || fallback.summary,
+      pipeline: normalizePipeline(parsed.pipeline, fallback.pipeline),
+      review: stringValue(parsed.review) || fallback.review,
+      recommendedDiff: textArray(parsed.recommendedDiff, fallback.recommendedDiff),
     }
   } catch {
     return {
-      ...deterministicPlan(prompt),
+      ...fallback,
       source: "openai",
-      review: text.slice(0, 700) || deterministicPlan(prompt).review,
+      review: text
+        .replace(/^```(?:json)?\s*/i, "")
+        .replace(/\s*```$/i, "")
+        .trim()
+        .slice(0, 700) || fallback.review,
     }
   }
 }

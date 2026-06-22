@@ -6,9 +6,8 @@ Live app: https://devguardian-ai.vercel.app
 
 Render backend: https://devguardian-ai-backend.onrender.com
 
-GitHub repository: https://github.com/imthegoodboy/DevGuardian-AI
-
-Hackathon challenge: https://dorahacks.io/hackathon/t3adkdevchallenge/detail
+ 
+ 
 
 The app was built for the Terminal3 ADK Developer Challenge:
 
