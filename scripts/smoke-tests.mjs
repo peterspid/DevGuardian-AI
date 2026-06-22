@@ -4,7 +4,6 @@ import { fileURLToPath } from "node:url"
 import path from "node:path"
 
 const frontendRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
-const repoRoot = path.resolve(frontendRoot, "..")
 
 function read(relativePath) {
   return readFileSync(path.join(frontendRoot, relativePath), "utf8")
@@ -37,8 +36,12 @@ const packageJson = JSON.parse(read("package.json"))
 assert.equal(packageJson.scripts.lint, "npm run typecheck", "lint script must run the TypeScript checker")
 assert.equal(packageJson.scripts.test, "node scripts/smoke-tests.mjs", "test script must run smoke tests")
 
-const readme = readFileSync(path.join(repoRoot, "README.md"), "utf8")
+const readme = readFileSync(path.join(frontendRoot, "README.md"), "utf8")
 assert.match(readme, /DEVGUARDIAN_OPERATOR_TOKEN/, "README must document operator token setup")
+assert.match(readme, /What It Does/, "README must describe what the app does")
+assert.match(readme, /Problem The Agent Solves/, "README must include the challenge problem answer")
+assert.match(readme, /Why Verifiable Identity Matters/, "README must include the verifiable identity answer")
+assert.match(readme, /https:\/\/devguardian-ai\.vercel\.app/, "README must link to the branded production URL")
 
 for (const asset of ["public/icon.svg", "public/site.webmanifest"]) {
   assert.equal(existsSync(path.join(frontendRoot, asset)), true, `${asset} must exist`)
