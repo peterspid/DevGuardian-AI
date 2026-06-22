@@ -181,7 +181,6 @@ Render:
 Current production targets:
 
 - Frontend: https://devguardian-ai.vercel.app
-- Vercel deployment alias: https://frontend-gamma-ten-34.vercel.app
 - Render backend: https://devguardian-ai-backend.onrender.com
 
 Set the same `DEVGUARDIAN_OPERATOR_TOKEN`, Terminal3, OpenAI, MongoDB, and optional GitHub values in both Vercel and Render so the frontend and backend behavior match.
