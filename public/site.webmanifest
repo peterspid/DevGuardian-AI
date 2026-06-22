@@ -1,0 +1,17 @@
+{
+  "name": "DevGuardian AI",
+  "short_name": "DevGuardian",
+  "description": "Terminal3-verified multi-agent software engineering workspace.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#f2f1ea",
+  "theme_color": "#111111",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
